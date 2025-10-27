@@ -1,0 +1,40 @@
+import React from "react";
+import Message from "./Message";
+
+function Hello() {
+  return (
+    <div>
+      <h2>Hello, World!</h2>
+      <Message />
+    </div>
+  );
+}
+
+export default Hello;
+import React from "react";
+
+function Message() {
+  return <p>What a beautiful day!</p>;
+import React from "react";
+import Hello from "./Hello";
+
+function App() {
+  return (
+    <div>
+      <Hello />
+      {/* Possiamo usare Hello più di una volta */}
+      <Hello />
+    </div>
+  );
+}
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+
+const rootElement = document.getElementById("root")!;
+const root = createRoot(rootElement);
+
+root.render(<App />)
+
+
+

@@ -1,0 +1,51 @@
+import React, { useState } from "react";
+
+function TodoList() {
+  // Stato per la lista di Todo
+  const [items, setItems] = useState([]);
+  // Stato per l'input corrente
+  const [inputValue, setInputValue] = useState("");
+
+  // Aggiunge un nuovo Todo
+  const handleAdd = () => {
+    if (inputValue.trim() === "") return; // non aggiungere stringhe vuote
+    setItems([...items, inputValue]);
+    setInputValue(""); // svuota l'input dopo l'aggiunta
+  };
+
+  // Rimuove un Todo specifico
+  const handleRemove = (index) => {
+    setItems(items.filter((_, i) => i !== index));
+  };
+
+  // Resetta la lista dei Todo
+  const handleReset = () => {
+    setItems([]);
+  };
+
+  return (
+    <div>
+      <h2>Todo List</h2>
+
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        placeholder="Scrivi un Todo"
+      />
+      <button onClick={handleAdd}>Add</button>
+      <button onClick={handleReset}>Reset</button>
+
+      <ul>
+        {items.map((item, index) => (
+          <li key={index}>
+            {item}{" "}
+            <button onClick={() => handleRemove(index)}>Remove</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TodoList;

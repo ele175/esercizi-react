@@ -1,0 +1,27 @@
+import React from 'react';
+
+// ✅ Componente Age
+function Age({ age }) {
+  return <p>Your age is {age}</p>;
+}
+
+// ✅ Componente Welcome
+function Welcome({ name = "Guest", age }) {
+  return (
+    <div>
+      <p>Welcome, <strong>{name}</strong>!</p>
+      <Age age={age} />
+    </div>
+  );
+}
+
+// ✅ Componente App
+function App() {
+  return (
+    <div>
+      <Welcome name="Luca" age={25} />
+    </div>
+  );
+}
+
+export default App;

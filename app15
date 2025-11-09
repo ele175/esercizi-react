@@ -1,0 +1,140 @@
+.welcome {
+  background-color: #f0f8ff; /* azzurro chiaro */
+  border: 2px solid #000080; /* blu scuro */
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css"; // import CSS globale
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+type WelcomeProps = { name: string; age?: number };
+
+export function Welcome({ name, age }: WelcomeProps) {
+  return (
+    <div className="welcome">
+      <p>Welcome, {name}!</p>
+      {age && <p>Your age is {age}</p>}
+    </div>
+  );
+}
+import { useCounter } from "./useCounter";
+
+export function Counter() {
+  const { count, increment, decrement, reset } = useCounter(0);
+
+  return (
+    <div>
+      <h2 style={{ color: "blue", fontSize: "2rem" }}>{count}</h2>
+      <button onClick={increment}>Up</button>
+      <button onClick={decrement}>Down</button>
+      <button onClick={reset}>Reset</button>
+    </div>
+  );
+}
+import { useForm } from "./useForm";
+
+export function Login() {
+  const { values, handleChange } = useForm({ username: "", password: "" });
+
+  const loginButtonStyle = {
+    backgroundColor: values.password.length < 8 ? "red" : "green",
+    color: "#fff",
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        name="username"
+        value={values.username}
+        onChange={handleChange}
+        placeholder="Username"
+      />
+      <input
+        type="password"
+        name="password"
+        value={values.password}
+        onChange={handleChange}
+        placeholder="Password"
+      />
+      <button style={loginButtonStyle}>Login</button>
+    </div>
+  );
+}
+clock {
+  font-size: 2rem;
+  color: white;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+import { useEffect, useState } from "react";
+import styles from "./Clock.module.scss";
+
+export function Clock() {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <h2 className={styles.clock}>{time.toLocaleTimeString()}</h2>;
+}
+export function UncontrolledLogin() {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    console.log({
+      username: formData.get("username"),
+      password: formData.get("password"),
+    });
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="p-4 bg-gray-200 rounded shadow-md max-w-sm mx-auto"
+    >
+      <input
+        name="username"
+        placeholder="Username"
+        className="border p-2 mb-2 w-full rounded"
+      />
+      <input
+        name="password"
+        type="password"
+        placeholder="Password"
+        className="border p-2 mb-2 w-full rounded"
+      />
+      <button
+        type="submit"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+      >
+        Login
+      </button>
+    </form>
+  );
+}
+import { useEffect, useRef } from "react";
+import { Form } from "react-bootstrap";
+
+export function FocusableInput() {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  return <Form.Control ref={inputRef} placeholder="Focus me on mount" />;
+}

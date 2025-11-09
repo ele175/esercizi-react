@@ -1,0 +1,97 @@
+import { useState } from "react";
+
+/**
+ * Hook che gestisce uno stato contatore con funzioni di incremento, decremento e reset.
+ */
+export function useCounter(initialValue = 0) {
+  const [count, setCount] = useState(initialValue);
+
+  const increment = () => setCount((prev) => prev + 1);
+  const decrement = () => setCount((prev) => prev - 1);
+  const reset = () => setCount(initialValue);
+
+  return { count, increment, decrement, reset };
+}
+import { useState } from "react";
+
+/**
+ * Hook per gestire uno stato di form controllato
+ * inizializzato con un oggetto { username: "", password: "" }
+ */
+export function useForm(initialValues) {
+  const [values, setValues] = useState(initialValues);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setValues((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  return { values, handleChange };
+}
+import { useState } from "react";
+
+/**
+ * Hook per recuperare i dati di un utente GitHub
+ */
+export function useGithubUser() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchUser = (username) => {
+    if (!username) return;
+
+    setLoading(true);
+    setError(null);
+
+    fetch(`https://api.github.com/users/${username}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Errore nel recupero dati GitHub");
+        return res.json();
+      })
+      .then((data) => setUser(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  };
+
+  return { user, loading, error, fetchUser };
+}
+import { useState } from "react";
+
+/**
+ * Hook per ottenere la posizione corrente dell'utente
+ */
+export function useCurrentLocation() {
+  const [position, setPosition] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation non supportata dal browser");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setPosition({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+        setLoading(false);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
+  };
+
+  return { position, loading, error, getLocation };
+}

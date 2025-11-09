@@ -1,0 +1,82 @@
+import React, { useState, useEffect } from "react";
+
+// Componente che mostra i dettagli di un singolo utente GitHub
+function GithubUser({ username }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!username) return;
+
+    setLoading(true);
+    setError(null);
+
+    fetch(`https://api.github.com/users/${username}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Errore nel recupero dei dati");
+        return res.json();
+      })
+      .then((data) => setUser(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [username]);
+
+  if (!username) return <p>Seleziona un utente dalla lista.</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  return (
+    <div>
+      <h2>{user.name || "No name available"}</h2>
+      <p>Login: {user.login}</p>
+      <img src={user.avatar_url} alt={user.login} width="150" />
+    </div>
+  );
+}
+
+// Componente che mostra una lista di utenti GitHub e permette di selezionarne uno
+function GithubUsers() {
+  const [users, setUsers] = useState([]);
+  const [selectedUsername, setSelectedUsername] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Recupera la lista di utenti
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://api.github.com/users?per_page=10") // primi 10 utenti
+      .then((res) => {
+        if (!res.ok) throw new Error("Errore nel recupero utenti");
+        return res.json();
+      })
+      .then((data) => setUsers(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Loading users...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  return (
+    <div>
+      <h1>Github Users</h1>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>
+            <button onClick={() => setSelectedUsername(user.login)}>
+              {user.login}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <hr />
+
+      {/* Mostra i dettagli dell'utente selezionato */}
+      <GithubUser username={selectedUsername} />
+    </div>
+  );
+}
+
+export default GithubUsers;

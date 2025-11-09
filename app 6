@@ -1,0 +1,58 @@
+import React from "react";
+
+// ✅ Componente MouseClicker
+function MouseClicker() {
+  const handleButtonClick = (event) => {
+    console.log("Button name:", event.target.name);
+  };
+
+  const handleImageClick = (event) => {
+    console.log("Image src:", event.target.src);
+
+    // 👇 Impedisce la propagazione dell'evento al pulsante
+    event.stopPropagation();
+  };
+
+  return (
+    <div>
+      <button name="one" onClick={handleButtonClick}>
+        {/* L’immagine è all’interno del pulsante */}
+        <img
+          src="https://via.placeholder.com/50"
+          alt="icon"
+          onClick={handleImageClick}
+        />
+        Clicca me!
+      </button>
+    </div>
+  );
+}
+
+// ✅ Componente MultiButton
+function MultiButton() {
+  const handleClick = (event) => {
+    console.log("Hai cliccato il pulsante:", event.target.name);
+  };
+
+  return (
+    <div>
+      <button name="one" onClick={handleClick}>One</button>
+      <button name="two" onClick={handleClick}>Two</button>
+      <button name="three" onClick={handleClick}>Three</button>
+    </div>
+  );
+}
+
+// ✅ Esempio di utilizzo in App.js
+function App() {
+  return (
+    <div>
+      <h1>Esercizio sugli eventi React</h1>
+      <MouseClicker />
+      <hr />
+      <MultiButton />
+    </div>
+  );
+}
+
+export default App;

@@ -1,0 +1,98 @@
+import React, { useEffect, useRef, useState, StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+/* ✅ 1. FocusableInput
+   - Quando il componente viene montato, l’input riceve automaticamente il focus.
+*/
+function FocusableInput() {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current.focus(); // mette il focus sull’input dopo il rendering
+  }, []);
+
+  return (
+    <div>
+      <h2>Focusable Input</h2>
+      <input ref={inputRef} type="text" placeholder="Sono automaticamente a fuoco!" />
+    </div>
+  );
+}
+
+/* ✅ 2. StrictEffectDemo
+   - Usa StrictMode e stampa un messaggio SOLO al primo montaggio.
+   - Usa un ref per tenere traccia se il componente è già stato montato.
+*/
+function StrictEffectDemo() {
+  const hasMounted = useRef(false);
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      console.log("StrictEffectDemo montato per la prima volta!");
+      hasMounted.current = true;
+    }
+  }, []);
+
+  return <h2>Guarda la console per il messaggio di montaggio</h2>;
+}
+
+/* ✅ 3. Counter con ref che tiene la direzione (“up” o “down”)
+   - Ogni volta che il valore del contatore cambia, aggiorna un ref con la direzione.
+   - Stampa la direzione nella console SOLO se è diversa dalla precedente.
+*/
+function Counter({ initialValue = 0, increment = 1 }) {
+  const [count, setCount] = useState(initialValue);
+
+  const directionRef = useRef(null); // contiene "up" o "down"
+  const prevDirectionRef = useRef(null); // per confrontare con la precedente
+
+  useEffect(() => {
+    let newDirection = null;
+
+    if (count > initialValue) newDirection = "up";
+    else if (count < initialValue) newDirection = "down";
+
+    // Aggiorna il ref solo se è cambiato
+    if (newDirection && newDirection !== directionRef.current) {
+      directionRef.current = newDirection;
+      console.log("Direzione cambiata:", directionRef.current);
+      prevDirectionRef.current = directionRef.current;
+    }
+  }, [count, initialValue]);
+
+  const handleIncrement = () => setCount((prev) => prev + increment);
+  const handleDecrement = () => setCount((prev) => prev - increment);
+  const handleReset = () => setCount(initialValue);
+
+  return (
+    <div>
+      <h2>Counter: {count}</h2>
+      <button onClick={handleIncrement}>+</button>
+      <button onClick={handleDecrement}>−</button>
+      <button onClick={handleReset}>Reset</button>
+    </div>
+  );
+}
+
+/* ✅ App principale che mostra tutti i componenti */
+function App() {
+  return (
+    <StrictMode>
+      <div style={{ fontFamily: "sans-serif", padding: "1rem" }}>
+        <h1>React useRef e useEffect demo</h1>
+
+        <FocusableInput />
+        <hr />
+
+        <StrictEffectDemo />
+        <hr />
+
+        <Counter initialValue={10} increment={2} />
+      </div>
+    </StrictMode>
+  );
+}
+
+/* ✅ Monta l'app */
+const root = createRoot(document.getElementById("root"));
+root.render(<App />);

@@ -1,0 +1,34 @@
+import { useQuery } from "@tanstack/react-query";
+
+/**
+ * Hook per recuperare dati di un utente GitHub usando React Query
+ * @param {string | null} username - Il nome utente GitHub
+ */
+export function useGithubUser(username) {
+  // useQuery con enabled: false evita la richiesta automatica
+  const query = useQuery(
+    ["githubUser", username],
+    async () => {
+      const res = await fetch(`https://api.github.com/users/${username}`);
+      if (!res.ok) throw new Error("Errore nel recupero dei dati GitHub");
+      return res.json();
+    },
+    {
+      enabled: !!username, // non esegue la query se username è null o vuoto
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  // funzione per forzare un refetch manuale
+  const fetchUser = () => {
+    if (!username) return;
+    query.refetch();
+  };
+
+  return {
+    user: query.data,
+    loading: query.isLoading,
+    error: query.isError ? query.error?.message : null,
+    fetchUser,
+  };
+}

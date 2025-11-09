@@ -1,0 +1,44 @@
+import React from "react";
+
+/* ✅ Componente Color
+   - Riceve una prop `name` e mostra il nome del colore.
+*/
+function Color({ name }) {
+  return <li>{name}</li>;
+}
+
+/* ✅ Componente Colors
+   - Riceve una prop `items`, che è un array di oggetti { id, name }.
+   - Renderizza un <li> (tramite il componente Color) per ciascun elemento.
+*/
+function Colors({ items = [] }) {
+  return (
+    <div>
+      <h2>Lista dei colori</h2>
+      <ul>
+        {items.map((color) => (
+          <Color key={color.id} name={color.name} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ✅ Esempio d’uso nel componente App */
+function App() {
+  const colorList = [
+    { id: 1, name: "Red" },
+    { id: 2, name: "Green" },
+    { id: 3, name: "Blue" },
+    { id: 4, name: "Yellow" },
+  ];
+
+  return (
+    <div>
+      <h1>Esercizio: Colors Component</h1>
+      <Colors items={colorList} />
+    </div>
+  );
+}
+
+export default App;

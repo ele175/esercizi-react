@@ -1,0 +1,45 @@
+import React from "react";
+
+function UncontrolledLogin() {
+  // ✅ Gestore dell'invio del modulo
+  const handleSubmit = (event) => {
+    event.preventDefault(); // Impedisce il refresh della pagina
+
+    // ✅ Crea un oggetto FormData a partire dal form inviato
+    const formData = new FormData(event.target);
+
+    // ✅ Ottieni i valori dai campi del modulo
+    const username = formData.get("username");
+    const password = formData.get("password");
+
+    // ✅ Stampa i valori nella console
+    console.log("Username:", username);
+    console.log("Password:", password);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>
+          Username:{" "}
+          <input type="text" name="username" placeholder="Inserisci username" />
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Password:{" "}
+          <input
+            type="password"
+            name="password"
+            placeholder="Inserisci password"
+          />
+        </label>
+      </div>
+
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+
+export default UncontrolledLogin;

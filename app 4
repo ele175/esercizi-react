@@ -1,0 +1,36 @@
+import React, { useState } from "react";
+
+// ✅ Componente per mostrare il valore del contatore
+function CounterDisplay({ count }) {
+  return <h2>{count}</h2>;
+}
+
+// ✅ Componente principale Counter
+function Counter({ initialValue = 0, increment = 1 }) {
+  const [counter, setCounter] = useState(initialValue);
+  
+  const handleIncrement = () => {
+    setCounter(prev => prev + increment);
+  };
+
+  const handleDecrement = () => {
+    setCounter(prev => prev - increment);
+  };
+
+  const handleReset = () => {
+    setCounter(initialValue);
+  };
+
+  return (
+    <div>
+      {/* Mostriamo il valore del contatore in un componente separato */}
+      <CounterDisplay count={counter} />
+
+      <button onClick={handleIncrement}>Incrementa +{increment}</button>
+      <button onClick={handleDecrement}>Decrementa -{increment}</button>
+      <button onClick={handleReset}>Reset</button>
+    </div>
+  );
+}
+
+export default Counter;

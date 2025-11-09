@@ -1,0 +1,55 @@
+import React from "react";
+
+// ✅ Componente Age
+function Age({ age }) {
+  return <p>Your age is {age}</p>;
+}
+
+// ✅ Componente Message
+function Message({ age }) {
+  return (
+    <p>
+      {age > 18 ? "You are an adult!" : "You are very young!"}
+    </p>
+  );
+}
+
+// ✅ Componente Welcome
+function Welcome({ name, age }) {
+  return (
+    <div>
+      <p>Welcome, {name}!</p>
+
+      {/* 1️⃣ Renderizza Age solo se age > 18 */}
+      {age > 18 && <Age age={age} />}
+
+      {/* 2️⃣ Renderizza Age solo se age è presente */}
+      {age !== undefined && <Age age={age} />}
+
+      {/* 3️⃣ Renderizza Age solo se age > 18 e age < 65 */}
+      {age > 18 && age < 65 && <Age age={age} />}
+
+      {/* 4️⃣ Renderizza Age solo se age > 18 e name === "John" */}
+      {age > 18 && name === "John" && <Age age={age} />}
+
+      {/* 5️⃣ Un rendering "libero" di Age (sempre visibile) */}
+      <Age age={age} />
+
+      {/* ✅ Componente Message */}
+      <Message age={age} />
+    </div>
+  );
+}
+
+// ✅ Componente principale App
+function App() {
+  return (
+    <div>
+      <Welcome name="John" age={25} />
+      <hr />
+      <Welcome name="Alice" age={15} />
+    </div>
+  );
+}
+
+export default App;

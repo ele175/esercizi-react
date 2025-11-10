@@ -1,0 +1,223 @@
+const INCREMENT = 'INCREMENT';
+const DECREMENT = 'DECREMENT';
+const RESET = 'RESET';
+
+// Action creators
+export const increment = () => ({ type: INCREMENT });
+export const decrement = () => ({ type: DECREMENT });
+export const reset = () => ({ type: RESET });
+
+// Reducer
+export const counterReducer = (state = 0, action) => {
+  switch (action.type) {
+    case INCREMENT:
+      return state + 1;
+    case DECREMENT:
+      return state - 1;
+    case RESET:
+      return 0;
+    default:
+      return state;
+  }
+};
+import { createStore } from 'redux';
+import { counterReducer, increment } from './counter.js';
+
+const store = createStore(counterReducer);
+
+console.log('Stato iniziale:', store.getState());
+
+store.dispatch(increment());
+console.log('Dopo INCREMENT:', store.getState());
+const ADD_TODO = 'ADD_TODO';
+const REMOVE_TODO = 'REMOVE_TODO';
+const TOGGLE_TODO = 'TOGGLE_TODO';
+const ADD_TODO = 'ADD_TODO';
+const REMOVE_TODO = 'REMOVE_TODO';
+const TOGGLE_TODO = 'TOGGLE_TODO';
+
+import { createStore } from 'redux';
+import { counterReducer, increment } from './counter.js';
+
+const store = createStore(counterReducer);
+
+console.log('Stato iniziale:', store.getState());
+
+store.dispatch(increment());
+console.log('Dopo INCREMENT:', store.getState());
+import { createStore, combineReducers } from 'redux';
+import { counterReducer } from './counter.js';
+import { todosReducer } from './todos.js';
+import { increment } from './counter.js';
+import { addTodo } from './todos.js';
+
+const rootReducer = combineReducers({
+  counter: counterReducer,
+  todos: todosReducer,
+});
+
+const store = createStore(rootReducer);
+
+// Subscribe
+store.subscribe(() => {
+  console.log('Stato aggiornato:', store.getState());
+});
+
+store.dispatch(increment());
+store.dispatch(addTodo('Imparare Redux!'));
+import { createSlice } from '@reduxjs/toolkit';
+
+export const counterSlice = createSlice({
+  name: 'counter',
+  initialState: 0,
+  reducers: {
+    increment: state => state + 1,
+    decrement: state => state - 1,
+    reset: () => 0
+  }
+});
+
+export const { increment, decrement, reset } = counterSlice.actions;
+export default counterSlice.reducer;
+import { createSlice } from '@reduxjs/toolkit';
+
+export const todosSlice = createSlice({
+  name: 'todos',
+  initialState: [],
+  reducers: {
+    addTodo: (state, action) => {
+      state.push({ id: Date.now(), title: action.payload, completed: false });
+    },
+    removeTodo: (state, action) => {
+      return state.filter(todo => todo.id !== action.payload);
+    },
+    toggleTodo: (state, action) => {
+      const todo = state.find(t => t.id === action.payload);
+      if (todo) todo.completed = !todo.completed;
+    }
+  }
+});
+
+export const { addTodo, removeTodo, toggleTodo } = todosSlice.actions;
+export default todosSlice.reducer;
+export const LoggingMiddleware = store => next => action => {
+  console.log('Dispatching:', action);
+  const result = next(action);
+  console.log('Next state:', store.getState());
+  return result;
+};
+
+export const DelayMiddleware = store => next => action => {
+  if (action.meta?.delay) {
+    setTimeout(() => next(action), action.meta.delay);
+  } else {
+    next(action);
+  }
+};
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// Thunk
+export const fetchUser = createAsyncThunk(
+  'users/fetchUser',
+  async (username, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`https://api.github.com/users/${username}`);
+      if (!res.ok) throw new Error('Utente non trovato');
+      const data = await res.json();
+      return { id: data.id, name: data.name, login: data.login };
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+const usersSlice = createSlice({
+  name: 'users',
+  initialState: {
+    list: [],
+    loading: false,
+    error: null
+  },
+  reducers: {
+    addUser: (state, action) => {
+      state.list.push(action.payload);
+    },
+    removeUser: (state, action) => {
+      state.list = state.list.filter(u => u.id !== action.payload);
+    }
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchUser.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list.push(action.payload);
+      })
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  }
+});
+
+export const { addUser, removeUser } = usersSlice.actions;
+export default usersSlice.reducer;
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUser } from './usersSlice';
+
+const ReduxGithubUsers = () => {
+  const [username, setUsername] = useState('');
+  const dispatch = useDispatch();
+  const { list, loading, error } = useSelector(state => state.users);
+
+  const handleFetch = () => {
+    if (username.trim()) dispatch(fetchUser(username));
+  };
+
+  return (
+    <div>
+      <h2>GitHub Users</h2>
+      <input
+        type="text"
+        value={username}
+        placeholder="Inserisci username GitHub"
+        onChange={e => setUsername(e.target.value)}
+      />
+      <button onClick={handleFetch} disabled={loading}>
+        {loading ? 'Caricamento...' : 'Cerca'}
+      </button>
+
+      {error && <p style={{ color: 'red' }}>Errore: {error}</p>}
+
+      <ul>
+        {list.map(user => (
+          <li key={user.id}>
+            {user.name || 'Senza nome'} ({user.login})
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default ReduxGithubUsers;
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import ReduxCounter from './ReduxCounter';
+import ReduxGithubUsers from './ReduxGithubUsers';
+
+const App = () => (
+  <Provider store={store}>
+    <ReduxCounter />
+    <ReduxGithubUsers />
+  </Provider>
+);
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+

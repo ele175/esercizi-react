@@ -1,0 +1,64 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import GithubUser from '../GithubUser';
+
+// Mock globale di fetch
+beforeEach(() => {
+  global.fetch = vi.fn();
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe('GithubUser component', () => {
+  test('mostra messaggio se non viene passato username', () => {
+    render(<GithubUser />);
+    expect(screen.getByText(/Nessuno username specificato/i)).toBeInTheDocument();
+  });
+
+  test('mostra messaggio di caricamento iniziale', () => {
+    global.fetch.mockResolvedValueOnce({
+      json: () => Promise.resolve({ login: 'Mario' }),
+    });
+
+    render(<GithubUser username="Mario" />);
+    expect(screen.getByText(/Caricamento/i)).toBeInTheDocument();
+  });
+
+  test('renderizza i dati dell’utente quando il fetch ha successo', async () => {
+    global.fetch.mockResolvedValueOnce({
+      json: () =>
+        Promise.resolve({
+          login: 'MarioRossi',
+          avatar_url: 'https://avatars.githubusercontent.com/u/12345?v=4',
+          bio: 'Frontend Developer',
+        }),
+    });
+
+    render(<GithubUser username="MarioRossi" />);
+
+    // Attende che il DOM venga aggiornato dopo la chiamata fetch
+    await waitFor(() =>
+      expect(screen.getByText('MarioRossi')).toBeInTheDocument()
+    );
+
+    expect(screen.getByText('Frontend Developer')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toHaveAttribute(
+      'src',
+      'https://avatars.githubusercontent.com/u/12345?v=4'
+    );
+  });
+
+  test('mostra "Utente non trovato" se la risposta contiene message: "Not Found"', async () => {
+    global.fetch.mockResolvedValueOnce({
+      json: () => Promise.resolve({ message: 'Not Found' }),
+    });
+
+    render(<GithubUser username="NonEsiste123" />);
+
+    await waitFor(() =>
+      expect(screen.getByText(/Utente non trovato/i)).toBeInTheDocument()
+    );
+  });
+});

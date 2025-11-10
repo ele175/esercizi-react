@@ -1,0 +1,32 @@
+const Welcome = ({ name }) => {
+  return <h2>Benvenuto, {name}!</h2>;
+};
+export default Welcome;
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import Welcome from '../Welcome.jsx';
+
+describe('Welcome component', () => {
+  test('mostra il nome passato come prop', () => {
+    render(<Welcome name="Mario" />);
+    
+    // Verifica che il testo sia presente nel documento
+    const heading = screen.getByText(/Benvenuto, Mario!/i);
+    expect(heading).toBeInTheDocument();
+  });
+
+  test('renderizza un elemento <h2>', () => {
+    render(<Welcome name="Luigi" />);
+    
+    const heading = screen.getByRole('heading', { level: 2 });
+    expect(heading).toHaveTextContent('Benvenuto, Luigi!');
+  });
+
+  test('aggiorna il testo se cambia la prop', () => {
+    const { rerender } = render(<Welcome name="Anna" />);
+    expect(screen.getByText(/Benvenuto, Anna!/i)).toBeInTheDocument();
+
+    rerender(<Welcome name="Marco" />);
+    expect(screen.getByText(/Benvenuto, Marco!/i)).toBeInTheDocument();
+  });
+});

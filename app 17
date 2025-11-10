@@ -1,0 +1,36 @@
+import { Routes, Route, Link, Outlet } from 'react-router-dom';
+import Welcome from './components/Welcome';
+import Counter from './components/Counter';
+import ShowGithubUser from './components/ShowGithubUser';
+import GithubUserList from './components/GithubUserList';
+
+const App = () => {
+  return (
+    <div style={{ padding: '20px' }}>
+      <nav>
+        <Link to="/" style={{ marginRight: '10px' }}>Home</Link>
+        <Link to="/counter" style={{ marginRight: '10px' }}>Counter</Link>
+        <Link to="/users">Users</Link>
+      </nav>
+
+      <hr />
+
+      <Routes>
+        <Route path="/" element={<Welcome name="Mario" />} />
+        <Route path="/counter" element={<Counter />} />
+
+        {/* Rotta annidata per /users */}
+        <Route path="/users" element={<GithubUserList />}>
+          {/* Route di indice */}
+          <Route index element={<p>Aggiungi un utente e selezionalo</p>} />
+          <Route path=":username" element={<ShowGithubUser />} />
+        </Route>
+
+        {/* Rotta di fallback */}
+        <Route path="*" element={<h2>Not Found</h2>} />
+      </Routes>
+    </div>
+  );
+};
+
+export default App;

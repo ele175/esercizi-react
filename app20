@@ -1,0 +1,67 @@
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
+import UncontrolledForm from '../UncontrolledForm.jsx';
+
+describe('UncontrolledForm component', () => {
+  test('renderizza i campi di input e il bottone', () => {
+    render(<UncontrolledForm />);
+
+    expect(screen.getByPlaceholderText(/inserisci il nome/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/inserisci l'email/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /invia/i })).toBeInTheDocument();
+  });
+
+  test('invia i dati corretti al callback onSubmit', async () => {
+    const handleSubmit = vi.fn();
+    const user = userEvent.setup();
+
+    render(<UncontrolledForm onSubmit={handleSubmit} />);
+
+    const nameInput = screen.getByPlaceholderText(/inserisci il nome/i);
+    const emailInput = screen.getByPlaceholderText(/inserisci l'email/i);
+    const submitButton = screen.getByRole('button', { name: /invia/i });
+
+    await user.type(nameInput, 'Mario Rossi');
+    await user.type(emailInput, 'mario@example.com');
+    await user.click(submitButton);
+
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
+    expect(handleSubmit).toHaveBeenCalledWith({
+      name: 'Mario Rossi',
+      email: 'mario@example.com',
+    });
+  });
+
+  test('resetta il form dopo l’invio', async () => {
+    const user = userEvent.setup();
+    render(<UncontrolledForm />);
+
+    const nameInput = screen.getByPlaceholderText(/inserisci il nome/i);
+    const emailInput = screen.getByPlaceholderText(/inserisci l'email/i);
+    const submitButton = screen.getByRole('button', { name: /invia/i });
+
+    await user.type(nameInput, 'Luca Bianchi');
+    await user.type(emailInput, 'luca@example.com');
+    await user.click(submitButton);
+
+    // Dopo il submit il form viene resettato
+    expect(nameInput).toHaveValue('');
+    expect(emailInput).toHaveValue('');
+  });
+
+  test('non chiama onSubmit se non passato come prop', async () => {
+    const user = userEvent.setup();
+
+    render(<UncontrolledForm />);
+    const nameInput = screen.getByPlaceholderText(/inserisci il nome/i);
+    const emailInput = screen.getByPlaceholderText(/inserisci l'email/i);
+    const submitButton = screen.getByRole('button', { name: /invia/i });
+
+    await user.type(nameInput, 'Test User');
+    await user.type(emailInput, 'test@example.com');
+
+    // Il test deve passare senza errori anche senza onSubmit
+    await user.click(submitButton);
+  });
+});
